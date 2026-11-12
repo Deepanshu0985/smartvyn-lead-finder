@@ -1,0 +1,25 @@
+# Triggers a lead-finder run every 3 hours. (Vercel's free plan only allows a daily cron,
+# so GitHub Actions does the scheduling.) You can also run it by hand from the Actions tab.
+#
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   APP_URL      e.g. https://smartvyn-lead-finder.vercel.app   (no trailing slash)
+#   CRON_SECRET  the same value as CRON_SECRET in Vercel
+name: Run lead finder
+
+on:
+  schedule:
+    - cron: "7 */3 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger a run
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error --max-time 300 \
+            -X POST -H "Authorization: Bearer $CRON_SECRET" "$APP_URL/api/run"
