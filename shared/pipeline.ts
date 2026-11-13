@@ -44,6 +44,14 @@ async function pool<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>
 
 const errText = (err: unknown) => (err instanceof Error ? err.message : String(err)).slice(0, 200);
 
+/** Turns many identical failures into one line: "classify failed for 8 posts (a, b, c, ...): <reason>". */
+function collapse(kind: string, failures: Map<string, string[]>): string[] {
+  return [...failures].map(([message, ids]) => {
+    const shown = ids.slice(0, 3).join(", ") + (ids.length > 3 ? ", ..." : "");
+    return `${kind} failed for ${ids.length} post${ids.length === 1 ? "" : "s"} (${shown}): ${message}`;
+  });
+}
+
 export async function runPipeline(deps: Deps, cfg: Config): Promise<RunSummary> {
   const nowMs = deps.now();
   const summary: RunSummary = {
@@ -71,13 +79,18 @@ export async function runPipeline(deps: Deps, cfg: Config): Promise<RunSummary> 
   const batch = fresh.slice(0, cfg.maxAiCallsPerRun);
   summary.skippedByCap = fresh.length - batch.length;
 
+  const classifyFailures = new Map<string, string[]>();
+  const draftFailures = new Map<string, string[]>();
+  const noteFailure = (into: Map<string, string[]>, message: string, id: string) =>
+    into.set(message, [...(into.get(message) ?? []), id]);
+
   const results = await pool(batch, 3, async ({ post }): Promise<StoredPost | null> => {
     let c: Classification;
     try {
       c = await deps.classify(post);
     } catch (err) {
       // Not saved, so the post is tried again on the next run.
-      summary.errors.push(`classify ${post.id}: ${errText(err)}`);
+      noteFailure(classifyFailures, errText(err), post.id);
       return null;
     }
     summary.classified++;
@@ -88,7 +101,7 @@ export async function runPipeline(deps: Deps, cfg: Config): Promise<RunSummary> 
       try {
         draft = await deps.draft(post, c);
       } catch (err) {
-        summary.errors.push(`draft ${post.id}: ${errText(err)}`);
+        noteFailure(draftFailures, errText(err), post.id);
       }
     }
     return {
@@ -108,6 +121,8 @@ export async function runPipeline(deps: Deps, cfg: Config): Promise<RunSummary> 
       notified: false,
     };
   });
+
+  summary.errors.push(...collapse("classify", classifyFailures), ...collapse("draft", draftFailures));
 
   const stored = results.filter((r): r is StoredPost => r !== null);
   await deps.store.saveMany(stored);

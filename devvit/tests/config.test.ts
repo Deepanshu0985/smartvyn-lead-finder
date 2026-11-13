@@ -70,6 +70,10 @@ describe("devvit.json", () => {
     expect(config.scheduler.tasks["find-leads"].cron).toBe("*/30 * * * *");
   });
 
+  it("only looks at fresh posts", () => {
+    expect(devvitConfig.maxPostAgeHours).toBeLessThanOrEqual(12);
+  });
+
   it("keeps each run small enough to finish quickly", () => {
     expect(devvitConfig.maxAiCallsPerRun).toBeLessThanOrEqual(8);
     expect(devvitConfig.maxLeadsPerRun).toBeLessThanOrEqual(5);

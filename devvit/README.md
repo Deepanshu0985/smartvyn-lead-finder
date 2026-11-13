@@ -71,7 +71,7 @@ The schedule is the `cron` in `devvit.json`.
 
 ## Develop and test
 ```bash
-npm test            # 54 tests: Reddit reading, Redis storage, whole run, routes, devvit.json vs Reddit's schema, read-only guard
+npm test            # 55 tests: Reddit reading, Redis storage, whole run, routes, devvit.json vs Reddit's schema, read-only guard
 npm run typecheck   # against the real @devvit types
 npm run build       # writes dist/server/index.js (one self-contained CommonJS file)
 ```
@@ -88,5 +88,5 @@ npm run build       # writes dist/server/index.js (one self-contained CommonJS f
   `../shared/config.ts`.
 
 ## Still unknown
-- How long Reddit lets a scheduled run last. Each run is deliberately small (8 AI checks, 5 leads)
+- How long Reddit lets a scheduled run last. Each run is deliberately small (8 AI checks, 5 leads, posts under 8 hours old)
   and runs often instead.

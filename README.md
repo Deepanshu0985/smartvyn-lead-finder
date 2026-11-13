@@ -68,7 +68,7 @@ Everything is in **`src/config.ts`**: the subreddit list, keywords, minimum scor
 
 ```bash
 npm install
-npm test            # 64 tests: filter, AI parsing, Mistral client, whole pipeline, Telegram, storage, read-only guard
+npm test            # 68 tests: filter, AI parsing, Mistral client, whole pipeline, Telegram, storage, read-only guard
 ```
 
 Try the whole app offline with fake Reddit data and a fake Mistral/Telegram:

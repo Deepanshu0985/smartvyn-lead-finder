@@ -5,6 +5,8 @@ import { config, type Config } from "../../shared/config";
 
 export const devvitConfig: Config = {
   ...config,
+  // Replying to a day-old post is worth little, and a short window keeps the first run's backlog small.
+  maxPostAgeHours: 8,
   maxAiCallsPerRun: 8,
   maxLeadsPerRun: 5,
 };

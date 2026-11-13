@@ -96,6 +96,29 @@ describe("runPipeline", () => {
     expect(calls.classify.filter((id) => id === "a1")).toHaveLength(2);
   });
 
+  it("reports many identical failures as one line, not one per post", async () => {
+    const { run } = setup({
+      classify: async () => {
+        throw new Error("PERMISSION_DENIED: domain api.mistral.ai is not allowed");
+      },
+    });
+    const s = await run();
+    expect(s.classified).toBe(0);
+    expect(s.errors).toHaveLength(1);
+    expect(s.errors[0]).toMatch(/^classify failed for 7 posts \(.+, \.\.\.\): PERMISSION_DENIED: domain api\.mistral\.ai is not allowed$/);
+    // Nothing was saved, so every post is retried once the problem is fixed.
+    expect((await run()).newCandidates).toBe(7);
+  });
+
+  it("keeps different failures on separate lines", async () => {
+    const { run } = setup({
+      classify: async (p) => {
+        throw new Error(p.id === "a1" ? "429 slow down" : "403 forbidden");
+      },
+    });
+    expect((await run()).errors).toHaveLength(2);
+  });
+
   it("still notifies when only the draft fails, and says there is no draft", async () => {
     const { run, store } = setup({
       draft: async (p) => {
@@ -105,7 +128,7 @@ describe("runPipeline", () => {
     });
     const s = await run();
     expect(s.notified).toBe(5);
-    expect(s.errors.some((e) => e.startsWith("draft a1"))).toBe(true);
+    expect(s.errors.some((e) => e.startsWith("draft failed for 1 post (a1)"))).toBe(true);
     expect((await store.list("new", 50)).find((p) => p.id === "a1")?.draft).toBe("");
   });
 
