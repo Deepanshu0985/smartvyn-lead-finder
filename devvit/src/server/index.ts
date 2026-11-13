@@ -2,6 +2,7 @@
 // clients into the testable code in ../routes.ts and ../run.ts.
 
 import { createServer, getServerPort, reddit, redis, settings } from "@devvit/web/server";
+import { sendJson } from "../http";
 import { handleRequest } from "../routes";
 import { runFinder } from "../run";
 
@@ -13,8 +14,7 @@ const server = createServer(async (req, res) => {
       getSetting: (name) => settings.get<string>(name),
     }),
   );
-  res.writeHead(status, { "Content-Type": "application/json" });
-  res.end(JSON.stringify(body));
+  sendJson(res, status, body);
 });
 
 server.on("error", (err) => console.error(`Server error: ${err.stack}`));
