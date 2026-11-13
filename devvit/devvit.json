@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "smartvyn-leads",
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.js"
+  },
+  "permissions": {
+    "reddit": true,
+    "redis": true,
+    "http": {
+      "enable": true,
+      "domains": ["api.mistral.ai", "api.telegram.org"]
+    }
+  },
+  "scheduler": {
+    "tasks": {
+      "find-leads": {
+        "endpoint": "/internal/cron/find-leads",
+        "cron": "*/30 * * * *"
+      }
+    }
+  },
+  "menu": {
+    "items": [
+      {
+        "label": "Run Smartvyn lead finder now",
+        "description": "Search Reddit for fresh leads and send the best to Telegram",
+        "forUserType": "moderator",
+        "location": "subreddit",
+        "endpoint": "/internal/menu/run-now"
+      }
+    ]
+  },
+  "settings": {
+    "global": {
+      "mistralApiKey": {
+        "type": "string",
+        "label": "Mistral API key",
+        "isSecret": true
+      },
+      "telegramBotToken": {
+        "type": "string",
+        "label": "Telegram bot token",
+        "isSecret": true
+      },
+      "telegramChatId": {
+        "type": "string",
+        "label": "Telegram chat id",
+        "isSecret": true
+      }
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs --watch"
+  },
+  "additionalSourceRoots": ["../shared"],
+  "sourceIgnores": ["coverage/", "*.log", "tests/"]
+}

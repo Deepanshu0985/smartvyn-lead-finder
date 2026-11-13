@@ -1,5 +1,9 @@
 # Smartvyn Lead Finder
 
+> **Two ways to run it.** This folder is the Next.js version (Vercel + Supabase + GitHub Actions + Reddit API keys).
+> [`devvit/`](devvit/README.md) is the same finder as a Reddit **Devvit** app: it runs inside Reddit, needs no Reddit API
+> registration, no hosting and no database. Both share the filtering, AI prompts and pipeline in [`shared/`](shared).
+
 Finds fresh Reddit posts from people who need what Smartvyn builds, ranks them with Mistral, drafts a human-sounding reply, and sends the best ones to your phone on Telegram. **You review each draft and post it yourself.** Nothing is ever posted to Reddit automatically.
 
 ```
@@ -64,7 +68,7 @@ Everything is in **`src/config.ts`**: the subreddit list, keywords, minimum scor
 
 ```bash
 npm install
-npm test            # 57 tests: filter, AI parsing, whole pipeline, Telegram, storage, read-only guard
+npm test            # 64 tests: filter, AI parsing, Mistral client, whole pipeline, Telegram, storage, read-only guard
 ```
 
 Try the whole app offline with fake Reddit data and a fake Mistral/Telegram:
