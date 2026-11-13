@@ -7,7 +7,6 @@ export const config = {
     // Hiring boards: people who want to pay for work.
     "forhire",
     "hireaprogrammer",
-    "freelance_forhire",
     "jobbit",
     // Where small-business owners and founders ask for help.
     "smallbusiness",
@@ -28,7 +27,7 @@ export const config = {
    * Hiring boards tag client posts "[Hiring]" and freelancers' ads "[For Hire]".
    * On these boards only [Hiring]/[Task] posts that also match a keyword are kept.
    */
-  hiringBoards: ["forhire", "hireaprogrammer", "freelance_forhire", "jobbit"],
+  hiringBoards: ["forhire", "hireaprogrammer", "jobbit"],
 
   /**
    * Cheap first filter: a post must contain at least one of these (case-insensitive)
@@ -74,6 +73,45 @@ export const config = {
     '"build an MVP" OR "need an MVP" OR "AI agent for my"',
   ],
 
+  /**
+   * Signs that the poster WANTS something (help, a developer, advice), as opposed to just
+   * mentioning a topic. A post outside the hiring boards must contain a topic keyword AND one of
+   * these (or a "?" in the title) before any AI is used on it.
+   */
+  intentSignals: [
+    "looking for",
+    "looking to hire",
+    "need a ",
+    "need an ",
+    "need someone",
+    "need help",
+    "help",
+    "any idea",
+    "need to ",
+    "hire",
+    "hiring",
+    "recommend",
+    "how do i",
+    "how can i",
+    "how to",
+    "anyone",
+    "can someone",
+    "can anyone",
+    "who can",
+    "any tool",
+    "any way",
+    "want to build",
+    "want to automate",
+    "help me",
+    "help with",
+    "advice",
+    "suggestions",
+    "struggling",
+    "budget",
+    "freelancer",
+    "quote",
+  ],
+
   /** Posts whose title matches any of these are other freelancers advertising. Always skipped. */
   skipTitlePatterns: [/\[\s*for\s*hire\s*\]/i, /\bfor hire\b/i, /\[\s*hire\s*me\s*\]/i, /\bavailable for (work|hire)\b/i],
 
@@ -96,7 +134,7 @@ export const config = {
    * Where a link to the portfolio is acceptable in a draft.
    * Hiring boards: yes, when the poster is asking for a developer. Everywhere else: never.
    */
-  linksAllowedIn: ["forhire", "hireaprogrammer", "freelance_forhire", "jobbit"],
+  linksAllowedIn: ["forhire", "hireaprogrammer", "jobbit"],
 
   /** Delete ignored (irrelevant) posts after this many days to keep the table small. */
   pruneIgnoredAfterDays: 30,

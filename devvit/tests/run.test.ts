@@ -55,9 +55,9 @@ describe("runFinder (Devvit)", () => {
     const { env, f, r } = setup();
     const s = await runFinder(env);
     expect(s.fetched).toBe(14);
-    expect(s.newCandidates).toBe(8);
-    expect(s.classified).toBe(6); // capped at 6 AI checks per run
-    expect(s.skippedByCap).toBe(2);
+    expect(s.newCandidates).toBe(7);
+    expect(s.classified).toBe(7); // all 7 candidates fit under the cap of 8
+    expect(s.skippedByCap).toBe(0);
     expect(s.errors).toEqual([]);
     expect(s.notified).toBeGreaterThan(0);
     expect(s.notified).toBeLessThanOrEqual(5);
@@ -112,7 +112,7 @@ describe("runFinder (Devvit)", () => {
   it("still classifies when Telegram is not set up, and says so", async () => {
     const { env, f } = setup({}, { mistralApiKey: "k" });
     const s = await runFinder(env);
-    expect(s.classified).toBe(6);
+    expect(s.classified).toBe(7);
     expect(s.notified).toBe(0);
     expect(s.errors.some((e) => e.includes("Telegram is not set up"))).toBe(true);
     expect(f.telegram).toHaveLength(0);

@@ -4,7 +4,14 @@
 import type { Config } from "./config";
 import type { RedditPost } from "./types";
 
-export type Candidate = { post: RedditPost; keywordHits: number };
+export type Candidate = {
+  post: RedditPost;
+  keywordHits: number;
+  /** How many "I want something" phrases the post contains. */
+  intentHits: number;
+  /** Higher = checked by the AI first when the per-run cap cuts the list. */
+  priority: number;
+};
 
 const lower = (s: string) => s.toLowerCase();
 
@@ -17,6 +24,11 @@ export function countKeywordHits(post: RedditPost, keywords: string[]): number {
   return keywords.filter((k) => text.includes(lower(k))).length;
 }
 
+export function countIntentHits(post: RedditPost, signals: string[]): number {
+  const text = lower(`${post.title}\n${post.body}`);
+  return signals.filter((k) => text.includes(lower(k))).length;
+}
+
 /** "[Hiring]" or "[Task]" tags are how hiring boards mark posts from people who will pay. */
 function hasHiringTag(post: RedditPost): boolean {
   return /\[\s*(hiring|task)\s*\]/i.test(post.title) || /^(hiring|task)$/i.test(post.flair.trim());
@@ -24,7 +36,7 @@ function hasHiringTag(post: RedditPost): boolean {
 
 export function prefilter(
   posts: RedditPost[],
-  cfg: Pick<Config, "keywords" | "skipTitlePatterns" | "maxPostAgeHours" | "hiringBoards">,
+  cfg: Pick<Config, "keywords" | "intentSignals" | "skipTitlePatterns" | "maxPostAgeHours" | "hiringBoards">,
   nowMs: number,
 ): Candidate[] {
   const maxAgeMs = cfg.maxPostAgeHours * 3_600_000;
@@ -38,12 +50,23 @@ export function prefilter(
 
     const keywordHits = countKeywordHits(post, cfg.keywords);
     if (keywordHits === 0) continue;
-    // On hiring boards only posts from people who will pay are worth a look.
-    if (isHiringBoard(post, cfg) && !hasHiringTag(post)) continue;
 
-    out.push({ post, keywordHits });
+    const hiringBoard = isHiringBoard(post, cfg);
+    const tagged = hasHiringTag(post);
+    // On hiring boards only posts from people who will pay are worth a look.
+    if (hiringBoard && !tagged) continue;
+
+    // Elsewhere, a topic keyword alone is not enough (most posts that mention "website" want nothing):
+    // the poster must also ask for something.
+    const intentHits = countIntentHits(post, cfg.intentSignals);
+    const asksQuestion = post.title.includes("?");
+    if (!tagged && intentHits === 0 && !asksQuestion) continue;
+
+    // Posts tagged [Hiring] come first, then those that clearly ask for something.
+    const priority = (tagged ? 6 : 0) + intentHits * 2 + (asksQuestion ? 1 : 0) + keywordHits;
+    out.push({ post, keywordHits, intentHits, priority });
   }
 
-  // Best-matching, then newest, first: if the AI cap is hit, the cut ones are the weakest.
-  return out.sort((a, b) => b.keywordHits - a.keywordHits || b.post.createdUtc - a.post.createdUtc);
+  // If the per-run AI cap cuts the list, the cut ones are the weakest; ties go to the newest.
+  return out.sort((a, b) => b.priority - a.priority || b.post.createdUtc - a.post.createdUtc);
 }

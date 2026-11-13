@@ -43,13 +43,13 @@ describe("runPipeline", () => {
     const { run, calls, store } = setup();
     const s = await run();
 
-    expect(s).toMatchObject({ fetched: 14, candidates: 8, newCandidates: 8, classified: 8, leadsFound: 5, notified: 5, skippedByCap: 0, errors: [] });
+    expect(s).toMatchObject({ fetched: 14, candidates: 7, newCandidates: 7, classified: 7, leadsFound: 5, notified: 5, skippedByCap: 0, errors: [] });
     // Drafts are only written for leads, never for irrelevant posts.
     expect(new Set(calls.draft)).toEqual(new Set([...LEADS, ...QUESTIONS]));
     expect(new Set(calls.notified[0])).toEqual(new Set([...LEADS, ...QUESTIONS]));
     // Irrelevant posts are remembered (so they are not re-checked) but kept off the list.
-    expect(await store.seenIds(["a7", "a8", "b4"])).toEqual(new Set(["a7", "a8", "b4"]));
-    expect((await store.list("ignored", 50)).map((p) => p.id).sort()).toEqual(["a7", "a8", "b4"]);
+    expect(await store.seenIds(["a7", "a8"])).toEqual(new Set(["a7", "a8"]));
+    expect((await store.list("ignored", 50)).map((p) => p.id).sort()).toEqual(["a7", "a8"]);
   });
 
   it("sends the best match first", async () => {
@@ -71,7 +71,7 @@ describe("runPipeline", () => {
   it("caps AI calls per run and picks up the rest next time", async () => {
     const { run, calls } = setup({}, { ...config, maxAiCallsPerRun: 3 });
     const first = await run();
-    expect(first).toMatchObject({ classified: 3, skippedByCap: 5 });
+    expect(first).toMatchObject({ classified: 3, skippedByCap: 4 });
     const second = await run();
     expect(second.classified).toBe(3);
     expect(new Set(calls.classify).size).toBe(6); // no repeats across runs
@@ -88,7 +88,7 @@ describe("runPipeline", () => {
     });
     const first = await run();
     expect(first.errors.some((e) => e.includes("a1") && e.includes("429"))).toBe(true);
-    expect(first.classified).toBe(7);
+    expect(first.classified).toBe(6);
 
     fail = false;
     const second = await run();

@@ -71,16 +71,22 @@ The schedule is the `cron` in `devvit.json`.
 
 ## Develop and test
 ```bash
-npm test            # 48 tests: Reddit reading, Redis storage, whole run, routes, devvit.json vs Reddit's schema, read-only guard
+npm test            # 54 tests: Reddit reading, Redis storage, whole run, routes, devvit.json vs Reddit's schema, read-only guard
 npm run typecheck   # against the real @devvit types
 npm run build       # writes dist/server/index.js (one self-contained CommonJS file)
 ```
 
-## Not verified yet (needs a real Reddit login, which only you have)
-- That Reddit accepts the outgoing-request domains (`api.mistral.ai`, `api.telegram.org`) without a
-  separate approval step. If `devvit upload` or the first run complains about a domain, that is it.
-- That `reddit.getNewPosts` may read subreddits where the app is **not** installed. Reddit's docs
-  confirm `reddit.searchPosts` searches all of Reddit. If subreddit listings are refused, the
-  toast and logs show `r/<name>: <error>` for each, and the Reddit-wide searches still run.
-- How long Reddit lets a scheduled task run. Each run is deliberately small (6 AI checks, 5 leads)
+## What a real Reddit run has shown so far
+- **Reading works.** The first playtest run fetched 414 posts across the configured subreddits and
+  searches, including subreddits where the app is not installed.
+- **Outgoing domains must be approved by Reddit.** Until `api.mistral.ai` and `api.telegram.org` are
+  approved, runs fail with `PERMISSION_DENIED ... HTTP request to domain: api.mistral.ai is not
+  allowed`. Reddit's HTTP Fetch rules decide this; request approval from your app's page on
+  developers.reddit.com. Posts whose AI check failed are kept for retry, so nothing is lost while
+  you wait.
+- A banned subreddit shows up as `r/<name>: ... banned` in the run summary; remove it from
+  `../shared/config.ts`.
+
+## Still unknown
+- How long Reddit lets a scheduled run last. Each run is deliberately small (8 AI checks, 5 leads)
   and runs often instead.

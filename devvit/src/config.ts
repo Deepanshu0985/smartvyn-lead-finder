@@ -5,6 +5,6 @@ import { config, type Config } from "../../shared/config";
 
 export const devvitConfig: Config = {
   ...config,
-  maxAiCallsPerRun: 6,
+  maxAiCallsPerRun: 8,
   maxLeadsPerRun: 5,
 };

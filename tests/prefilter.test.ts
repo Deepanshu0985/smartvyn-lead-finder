@@ -8,7 +8,7 @@ describe("prefilter", () => {
   const ids = kept.map((c) => c.post.id);
 
   it("keeps fresh posts that match a keyword", () => {
-    expect(new Set(ids)).toEqual(new Set(["a1", "a4", "a6", "a7", "a8", "a9", "b2", "b4"]));
+    expect(new Set(ids)).toEqual(new Set(["a1", "a4", "a6", "a7", "a8", "a9", "b2"]));
   });
 
   it("drops other freelancers' [For Hire] posts", () => {
@@ -41,9 +41,22 @@ describe("prefilter", () => {
     expect(prefilter([flaired], config, NOW_MS)).toHaveLength(1);
   });
 
-  it("puts the best keyword matches first, newest first on ties", () => {
-    const hits = kept.map((c) => c.keywordHits);
-    expect([...hits].sort((a, b) => b - a)).toEqual(hits);
+  it("puts [Hiring] posts and clear requests first, newest first on ties", () => {
+    const priorities = kept.map((c) => c.priority);
+    expect([...priorities].sort((a, b) => b - a)).toEqual(priorities);
+    expect(["a1", "a9"]).toContain(ids[0]); // the [Hiring] posts lead
+  });
+
+  it("drops a post that only mentions a topic without asking for anything", () => {
+    const musing = { ...fixturePosts().find((p) => p.id === "a4")!, id: "x4", title: "We launched our new website today", body: "Sharing our launch story." };
+    expect(prefilter([musing], config, NOW_MS)).toHaveLength(0);
+    // ...but a question about the same topic stays.
+    expect(prefilter([{ ...musing, title: "Is our new website any good?" }], config, NOW_MS)).toHaveLength(1);
+  });
+
+  it("keeps a post whose body says what the poster wants", () => {
+    const wants = { ...fixturePosts().find((p) => p.id === "a4")!, id: "x5", title: "Website for my gym", body: "I am looking for someone to build it." };
+    expect(prefilter([wants], config, NOW_MS)).toHaveLength(1);
   });
 
   it("skips removed and deleted posts", () => {
