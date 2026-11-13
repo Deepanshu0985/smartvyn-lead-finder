@@ -6,7 +6,7 @@
 
 import "server-only";
 import { readFile } from "node:fs/promises";
-import type { RedditPost } from "./types";
+import type { RedditPost } from "@shared/types";
 
 const USER_AGENT =
   process.env.REDDIT_USER_AGENT || "web:smartvyn-lead-finder:v0.1 (read-only lead finder by Smartvyn)";

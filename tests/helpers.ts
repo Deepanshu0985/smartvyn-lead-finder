@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { parseListing } from "../src/lib/reddit";
-import type { RedditPost } from "../src/lib/types";
+import type { RedditPost } from "../shared/types";
 
 /** The fixed "now" the fixture was written against (unix seconds). */
 export const REFERENCE = 1791000000;

@@ -1,10 +1,10 @@
 // The hard rule of this project: it never writes to Reddit. These tests fail the build if a
 // Reddit write endpoint ever shows up in the source.
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const SRC = new URL("../src", import.meta.url).pathname;
+const ROOT = new URL("../", import.meta.url).pathname;
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -13,7 +13,11 @@ function files(dir: string): string[] {
   });
 }
 
-const sources = files(SRC).map((path) => ({ path: path.replace(SRC, "src"), text: readFileSync(path, "utf8") }));
+// The Next.js app and the code it shares with the Devvit app.
+const sources = [...files(join(ROOT, "src")), ...files(join(ROOT, "shared"))].map((path) => ({
+  path: relative(ROOT, path),
+  text: readFileSync(path, "utf8"),
+}));
 
 describe("read-only guarantee", () => {
   it("scans a meaningful amount of source", () => {

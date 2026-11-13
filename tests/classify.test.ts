@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { config } from "../src/config";
-import { classifyMessages, classifyPost, cleanDraft, draftMessages, draftReply, parseClassification } from "../src/lib/classify";
+import { config } from "../shared/config";
+import { classifyMessages, classifyPost, cleanDraft, draftMessages, draftReply, parseClassification } from "../shared/classify";
 import { fixturePosts } from "./helpers";
 
 const post = (id: string) => fixturePosts().find((p) => p.id === id)!;

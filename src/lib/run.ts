@@ -1,10 +1,10 @@
 // Wires the real services (Reddit, Mistral, Supabase, Telegram) into the pipeline.
 
 import "server-only";
-import { config } from "../config";
-import { classifyPost, draftReply, type Llm } from "./classify";
-import { chatJSON, chatText, hasMistralKey } from "./mistral";
-import { runPipeline, type RunSummary } from "./pipeline";
+import { classifyPost, draftReply } from "@shared/classify";
+import { config } from "@shared/config";
+import { runPipeline, type RunSummary } from "@shared/pipeline";
+import { hasMistralKey, mistralFromEnv } from "./mistral";
 import { fetchNewPosts } from "./reddit";
 import { getStore } from "./store";
 import { hasTelegram, sendLeads } from "./telegram";
@@ -17,7 +17,7 @@ export async function runFinder(): Promise<RunSummary> {
   if (g.__finderRunning) throw new Error("A run is already in progress");
   g.__finderRunning = true;
   try {
-    const llm: Llm = { json: chatJSON, text: chatText };
+    const llm = mistralFromEnv();
     return await runPipeline(
       {
         fetchPosts: () => fetchNewPosts(config.subreddits, config.postsPerSubreddit),

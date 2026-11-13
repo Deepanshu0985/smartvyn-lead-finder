@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { escapeHtml, formatLead, sendLeads, timeAgo } from "../src/lib/telegram";
-import type { StoredPost } from "../src/lib/types";
+import { escapeHtml, formatLead, timeAgo } from "../shared/format";
+import { sendLeads } from "../src/lib/telegram";
+import type { StoredPost } from "../shared/types";
 import { NOW_MS } from "./helpers";
 
 const lead = (over: Partial<StoredPost> = {}): StoredPost => ({

@@ -62,6 +62,18 @@ export const config = {
     "crm",
   ],
 
+  /**
+   * Reddit-wide searches (used by the Devvit app, which can search all of Reddit rather than
+   * only the subreddits above). Each is run newest-first over the last day.
+   */
+  searchQueries: [
+    '"need a chatbot" OR "chatbot for my" OR "build a chatbot"',
+    '"looking for a developer" OR "need a developer" OR "hire a developer"',
+    '"automate my" OR "automate our" OR "automation for my"',
+    '"need a website" OR "build me a website" OR "need an app built"',
+    '"build an MVP" OR "need an MVP" OR "AI agent for my"',
+  ],
+
   /** Posts whose title matches any of these are other freelancers advertising. Always skipped. */
   skipTitlePatterns: [/\[\s*for\s*hire\s*\]/i, /\bfor hire\b/i, /\[\s*hire\s*me\s*\]/i, /\bavailable for (work|hire)\b/i],
 

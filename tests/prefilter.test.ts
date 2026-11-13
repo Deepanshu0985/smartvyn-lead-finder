@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { config } from "../src/config";
-import { prefilter } from "../src/lib/prefilter";
+import { config } from "../shared/config";
+import { prefilter } from "../shared/prefilter";
 import { fixturePosts, NOW_MS } from "./helpers";
 
 describe("prefilter", () => {

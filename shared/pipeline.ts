@@ -2,10 +2,9 @@
 // -> store -> notify. Everything external is injected, so the whole flow is testable
 // without touching Reddit, Mistral, Telegram or a database.
 
-import type { Config } from "../config";
+import type { Config } from "./config";
 import { prefilter } from "./prefilter";
-import type { Store } from "./store";
-import type { Classification, RedditPost, StoredPost } from "./types";
+import type { Classification, RedditPost, Store, StoredPost } from "./types";
 
 export type Deps = {
   fetchPosts: () => Promise<{ posts: RedditPost[]; errors: string[] }>;

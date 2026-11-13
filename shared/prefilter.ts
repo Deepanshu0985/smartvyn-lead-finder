@@ -1,7 +1,7 @@
 // Cheap, free checks that run before any AI call. Everything here is pure so it is
 // easy to test.
 
-import type { Config } from "../config";
+import type { Config } from "./config";
 import type { RedditPost } from "./types";
 
 export type Candidate = { post: RedditPost; keywordHits: number };

@@ -7,7 +7,7 @@ import { COOKIE, safeEqual, sessionToken } from "@/lib/auth";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { runFinder } from "@/lib/run";
 import { getStore } from "@/lib/store";
-import type { Status } from "@/lib/types";
+import type { Status } from "@shared/types";
 
 async function signedIn(): Promise<boolean> {
   // Server actions are public endpoints, so every one re-checks the session.

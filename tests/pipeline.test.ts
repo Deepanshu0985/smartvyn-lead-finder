@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { config, type Config } from "../src/config";
-import { runPipeline, type Deps } from "../src/lib/pipeline";
+import { config, type Config } from "../shared/config";
+import { runPipeline, type Deps } from "../shared/pipeline";
 import { memoryStore } from "../src/lib/store";
-import type { Classification, RedditPost, StoredPost } from "../src/lib/types";
+import type { Classification, RedditPost, StoredPost } from "../shared/types";
 import { fixturePosts, NOW_MS } from "./helpers";
 
 const LEADS = new Set(["a1", "a6", "a9", "b2"]);

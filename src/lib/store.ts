@@ -3,20 +3,8 @@
 // in-memory store so local development works with zero setup.
 
 import "server-only";
-import type { Status, StoredPost } from "./types";
+import type { Status, Store, StoredPost } from "@shared/types";
 
-export type Store = {
-  /** Which of these post ids we have already processed. */
-  seenIds(ids: string[]): Promise<Set<string>>;
-  saveMany(posts: StoredPost[]): Promise<void>;
-  markNotified(ids: string[]): Promise<void>;
-  /** Leads that scored well enough to send but have not been sent yet (e.g. Telegram was down). */
-  unnotified(minScore: number, limit: number): Promise<StoredPost[]>;
-  list(status: Status, limit: number): Promise<StoredPost[]>;
-  setStatus(id: string, status: Status): Promise<void>;
-  /** Deletes ignored posts that were posted before this time (unix ms). */
-  prune(cutoffMs: number): Promise<void>;
-};
 
 const SAFE_ID = /^[a-z0-9_]{1,20}$/i;
 export const safeIds = (ids: string[]) => ids.filter((id) => SAFE_ID.test(id));

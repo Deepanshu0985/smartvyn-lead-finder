@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { memoryStore, safeIds, supabaseStore } from "../src/lib/store";
-import type { StoredPost } from "../src/lib/types";
+import type { StoredPost } from "../shared/types";
 
 const post = (id: string, over: Partial<StoredPost> = {}): StoredPost => ({
   id, subreddit: "forhire", title: id, url: `https://x/${id}`, author: "u", body: "", postedAt: new Date().toISOString(),

@@ -2,14 +2,8 @@
 // And a first draft of a human-sounding reply. Posts are untrusted text from the internet,
 // so the prompts tell the model to treat them as data and never to follow instructions in them.
 
-import type { Config } from "../config";
-import type { ChatMessage } from "./mistral";
-import { SERVICES, type Classification, type PostType, type RedditPost, type Service } from "./types";
-
-export type Llm = {
-  json: <T>(messages: ChatMessage[]) => Promise<T>;
-  text: (messages: ChatMessage[]) => Promise<string>;
-};
+import type { Config } from "./config";
+import { SERVICES, type ChatMessage, type Classification, type Llm, type PostType, type RedditPost, type Service } from "./types";
 
 const BUSINESS = `Smartvyn is a small AI & software studio run by an engineer. It builds: AI chatbots for websites, AI automation (lead follow-up, document processing, CRM updates), AI integration into existing products, modern websites, full-stack web apps and mobile apps. It works with small businesses in India and worldwide and quotes a fixed price per project.`;
 
