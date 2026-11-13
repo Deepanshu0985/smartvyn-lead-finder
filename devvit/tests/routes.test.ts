@@ -37,6 +37,29 @@ describe("handleRequest", () => {
     expect(ran).toBe(false);
   });
 
+  it("logs when a run starts and finishes, with how long it took and the counts", async () => {
+    const lines: string[] = [];
+    await handleRequest("POST", "/internal/cron/find-leads", async () => summary, (m) => lines.push(m));
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toBe("[cron] run started");
+    expect(lines[1]).toMatch(/^\[cron\] run finished in \d+ms: .*"fetched":3/);
+  });
+
+  it("logs the reason when a run fails, for both the schedule and the menu", async () => {
+    const lines: string[] = [];
+    const fail = async () => { throw new Error("Telegram returned 401"); };
+    await handleRequest("POST", "/internal/cron/find-leads", fail, (m) => lines.push(m));
+    await handleRequest("POST", "/internal/menu/run-now", fail, (m) => lines.push(m));
+    expect(lines.filter((l) => l.includes("run failed after") && l.endsWith("Telegram returned 401"))).toHaveLength(2);
+  });
+
+  it("logs nothing for requests that do not start a run", async () => {
+    const lines: string[] = [];
+    await handleRequest("GET", "/internal/cron/find-leads", async () => summary, (m) => lines.push(m));
+    await handleRequest("POST", "/nope", async () => summary, (m) => lines.push(m));
+    expect(lines).toEqual([]);
+  });
+
   it("ignores a query string", async () => {
     expect((await handleRequest("POST", "/internal/cron/find-leads?x=1", async () => summary)).status).toBe(200);
   });
